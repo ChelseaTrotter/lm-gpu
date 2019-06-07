@@ -3,7 +3,7 @@
 include("../src/util.jl")
 using Distributed
 using DelimitedFiles
-import CuArrays.CuArray
+
 import Base.@elapsed 
 
 

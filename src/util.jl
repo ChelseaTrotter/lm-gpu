@@ -25,7 +25,6 @@ function print_cpu_timing(a, b, n)
 end
 
 function get_max_doubles()
-    # one_hundred_MB = 134217728
     one_gb = 2^30
     acf_mem = 16*one_gb
 
