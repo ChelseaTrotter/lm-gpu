@@ -6,6 +6,8 @@ using Dates
 using Random
 using Statistics
 using LinearAlgebra
+using CuArrays
+using CUDAnative
 
 import Base.@elapsed 
 
