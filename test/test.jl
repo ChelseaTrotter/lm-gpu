@@ -36,13 +36,13 @@ println("Number of threads using: $core_nums")
 #     for m in m_range    
 #         for p in p_range
 
-            Y = convert(Array{Float64,2},readdlm("/nics/d/home/xiaoqihu/hg/fastlmm-gpu/bxdData/traits.csv", ','; skipstart=1)[:,2:end-1])
+            Y = convert(Array{Float64,2},readdlm("../data/traits.csv", ','; skipstart=1)[:,2:end-1])
 
-            G_prob = convert(Array{Float64,2},readdlm("/nics/d/home/xiaoqihu/hg/fastlmm-gpu/bxdData/geno_prob.csv", ','; skipstart=1)[:,2:end])
+            G_prob = convert(Array{Float64,2},readdlm("../data/geno_prob.csv", ','; skipstart=1)[:,2:end])
 
             G = G_prob[:, 1:2:end]
 
-            X_temp = readdlm("/nics/d/home/xiaoqihu/hg/fastlmm-gpu/bxdData/traits.csv", ','; skipstart=1)[:,end]
+            X_temp = readdlm("../data/traits.csv", ','; skipstart=1)[:,end]
             # println("size of X: $(size(X_temp)[1]), $(typeof(X_temp))")
             
             X = hcat(ones(size(X_temp)[1]),process_x(X_temp))
@@ -73,17 +73,17 @@ println("Number of threads using: $core_nums")
                 # time_me_with_return(cpurun, Y,G,n);
                 # time_me_with_return(gpurun, Y,G,n,m,p);
 
-                # cpu_result = benchmark(10, cpurun, Y, G,n);
-                # gpu_result = benchmark(10, gpurun, Y, G,n,m,p);
-                # speedup = cpu_result[3]/gpu_result[3];
+                cpu_result = benchmark(10, cpurun, Y, G,n);
+                gpu_result = benchmark(10, gpurun, Y, G,n,m,p);
+                speedup = cpu_result[3]/gpu_result[3];
 
-                # println("$m, $n, $p, $(cpu_result[3]),  $(gpu_result[3]), $speedup\n");
+                println("$m, $n, $p, $(cpu_result[3]),  $(gpu_result[3]), $speedup\n");
 
 
-                cpurun_with_covar(Y, G, X, n)
-                cpu_result = benchmark(10,cpurun, Y, G, n)
-                cpu_covar_result = benchmark(10, cpurun_with_covar, Y,G,X,n)
-                println("$m, $n, $p, $(cpu_result[3]),  $(cpu_covar_result[3])\n");
+                # cpurun_with_covar(Y, G, X, n)
+                # cpu_result = benchmark(10,cpurun, Y, G, n)
+                # cpu_covar_result = benchmark(10, cpurun_with_covar, Y,G,X,n)
+                # println("$m, $n, $p, $(cpu_result[3]),  $(cpu_covar_result[3])\n");
 
                 # println("Correctnes result : ", check_correctness(cpurun(Y,G,n), cpurun_with_covar(Y,G,X,n)))
 

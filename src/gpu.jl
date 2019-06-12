@@ -1,7 +1,6 @@
-import CuArrays.CuArray
 
 function calculate_r(a::CuArray,b::CuArray)
-    return CuArrays.CUBLAS.gemm('T', 'N', a,b);
+    return CuArrays.BLAS.gemm('T', 'N', a,b);
 end   
 
 function gpurun(a::Array{Float64,2}, b::Array{Float64,2},n,m,p)
