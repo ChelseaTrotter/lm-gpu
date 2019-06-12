@@ -1,10 +1,19 @@
 
-
-include("../src/util.jl")
 using Distributed
 using DelimitedFiles
+using BenchmarkTools
+using Dates
+using Random
+using Statistics
+using LinearAlgebra
 
 import Base.@elapsed 
+
+
+include("../src/util.jl")
+include("../src/cpu.jl")
+include("../src/gpu.jl")
+include("../src/common.jl")
 
 
 
