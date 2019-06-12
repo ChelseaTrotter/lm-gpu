@@ -50,3 +50,13 @@ function cpurun(a::Array, b::Array, n)
     return lod
 end
 
+function print_cpu_timing(a, b, n)
+    a_std = time_me_with_return(get_standardized_matrix,a);
+    b_std = time_me_with_return(get_standardized_matrix,b);
+    #step 2: calculate R, matrix of corelation coefficients
+    r = time_me_with_return(calculate_r,a_std,b_std);
+    #step 3: calculate r square and lod score
+    lod = time_me_with_return(lod_score_multithread,n, r);
+    return lod
+
+end

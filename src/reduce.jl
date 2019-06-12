@@ -1,6 +1,4 @@
-function gpu_reduce(input)
 
-end
 
 function reduce_kernel(input, output, ndrange, rows)
     i = (blockIdx().x-1) * blockDim().x + threadIdx().x

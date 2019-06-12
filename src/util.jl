@@ -13,15 +13,16 @@ function check_correctness(a, b)
     end
 end
 
-function print_cpu_timing(a, b, n)
-    a_std = time_me_with_return(get_standardized_matrix,a);
-    b_std = time_me_with_return(get_standardized_matrix,b);
-    #step 2: calculate R, matrix of corelation coefficients
-    r = time_me_with_return(calculate_r,a_std,b_std);
-    #step 3: calculate r square and lod score
-    lod = time_me_with_return(lod_score_multithread,n, r);
-    return lod
+function set_blas_threads()
+    LinearAlgebra.BLAS.set_num_threads(16)
+    core_nums = ccall((:openblas_get_num_threads64_, Base.libblas_name), Cint, ())
+    println("Number of threads using: $core_nums")
+end
 
+function get_timing_file_name()
+    dt_now = Dates.format(Dates.now(), "yyyy-mm-ddTHH-MM-SS");
+    host = gethostname();
+    # file = open("../timing/genome-scan-timing@$host@$dt_now.csv", "a");
 end
 
 function get_max_doubles()
