@@ -39,6 +39,8 @@ function cpurun_with_covar(Y::Array{Float64,2}, G::Array{Float64,2}, X::Array{Fl
     return lod
 end
 
+
+##################### Running CPU Function ###################
 function cpurun(a::Array, b::Array, n)
     a_std = get_standardized_matrix(a);
     b_std = get_standardized_matrix(b);
@@ -47,8 +49,12 @@ function cpurun(a::Array, b::Array, n)
     #step 3: calculate r square and lod score
     # lod = lod_score(n, r);
     lod = lod_score_multithread(n,r)
-    return lod
+    # println("Size of CPU lod: $(size(lod))")
+    return findmax(lod, dims=2)
 end
+
+##############################################################
+
 
 function print_cpu_timing(a, b, n)
     a_std = time_me_with_return(get_standardized_matrix,a);

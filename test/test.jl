@@ -34,12 +34,48 @@ function run_genome_scan()
     if ((n*m + n*p + m*p) > get_max_doubles())
         println("too big to process")
     else
-        cpu_result = benchmark(10, cpurun, Y, G,n);
-        gpu_result = benchmark(10, gpurun, Y, G,n,m,p);
-        speedup = cpu_result[3]/gpu_result[3];
 
-        println("$m, $n, $p, $(cpu_result[3]),  $(gpu_result[3]), $speedup\n");
+        # compare_cpu_gpu_result(Y,G,n,m,p);
+        cpu_timing = benchmark(10, cpurun, Y, G,n);
+        gpu_timing = benchmark(10, gpurun, Y, G,n,m,p);
+        speedup = cpu_timing[3]/gpu_timing[3];
+
+        println("$m, $n, $p, $(cpu_timing[3]),  $(gpu_timing[3]), $speedup\n");
     end
+
+end
+
+function compare_cpu_gpu_result(Y,G,n,m,p)
+    cpu_result = cpurun(Y,G,n)
+    gpu_result = gpurun(Y,G,n,m,p)
+
+    cpu_max = cpu_result[1] 
+    cpu_max_idx = Array{Int64}(undef, m)
+    # println(cpu_result)
+    for i in 1:m
+        # print(cpu_result[2][i])
+        # print("$(cpu_result[2][i][2]), ")
+        cpu_max_idx[i] = cpu_result[2][i][2]
+    end
+
+    # idx_match = cpu_max_idx ≈ gpu_result[:,1]
+    # max_match = cpu_max ≈ gpu_result[:,2]
+
+    idx_match = check_correctness(cpu_max_idx[1:100], gpu_result[1:100,1])
+    max_match = check_correctness(cpu_max[35554:35556], gpu_result[35554, 35556,2])
+    
+    
+    # display(cpu_result[2][1:10])
+    # display(cpu_max_idx[1:10])
+    # display(gpu_result[1:10,1])
+
+    # display(cpu_max[35550:35556])
+    # display(gpu_result[35550:35556, 2])
+
+    # println(size(cpu_max))
+    # println(size(gpu_result))
+
+    println("Correctness result: Index match? $idx_match, Max Match? $max_match.")
 
 end
 
@@ -66,7 +102,8 @@ m = 700
 p = 3200
 
 set_blas_threads();
-run_simulation(n,m,p);
+# run_simulation(n,m,p);
+run_genome_scan();
 
 
 

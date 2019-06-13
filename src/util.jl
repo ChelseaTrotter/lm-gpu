@@ -4,13 +4,13 @@ function my_isapprox(x,y)
     return isapprox(x,y, atol=1e-3);
 end
 
-function check_correctness(a, b)
-        
-    if(all(map(my_isapprox, a, b)))
-        return "true"
-    else
-        return "false"
+function check_correctness(a, b, length)
+    for i in 1:length
+        if(!isapprox(a[i],b[i], atol=1e-3))
+            return false
+        end 
     end
+    return true
 end
 
 function set_blas_threads()

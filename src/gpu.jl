@@ -12,12 +12,13 @@ function gpurun(a::Array{Float64,2}, b::Array{Float64,2},n,m,p)
     d_r = calculate_r(d_a,d_b);
     gpu_square_lod(d_r,n,m,p)
     # gpu_reduce(d_r,m,p)
-    return collect(d_r[1, 1:p])
+    return collect(d_r[:, 1:2])
 end
 
 function gpu_square_lod(d_r::CuArray{Float64,2},n,m,p)
     #Get total number of threads 
     ndrange = prod(size(d_r))
+    # println("Size of d_r $(size(d_r))")
     #Get maximum number of threads per block
     dev = device()
     threads = attribute(dev, CUDAdrv.WARP_SIZE)
@@ -47,17 +48,22 @@ function reduce_kernel(input, rows, cols)
     # temp_max = shmem[1]
 
     # Trying for simplest kernel
-    if(tid < cols)
-        temp_max = input[1, tid]
-        for i in 1:rows
-            temp_max = max(temp_max,input[i, tid])
+    if(tid < rows)
+        temp_max = input[tid, 1]
+        max_idx = 1
+        for i in 1:cols
+            if temp_max < input[tid,i]
+                temp_max = input[tid,i]
+                max_idx = i
+            end
         end
-        input[1, tid] = temp_max
+        input[tid,1] = max_idx
+        input[tid,2] = temp_max
     end
     return
 end
 
-function gpu_reduce(input::CuArray{Float64,2}, rows, cols)
+# function gpu_reduce(input::CuArray{Float64,2}, rows, cols)
     #Get total number of threads 
     # ndrange = cols
     #Get maximum number of threads per block
@@ -71,6 +77,6 @@ function gpu_reduce(input::CuArray{Float64,2}, rows, cols)
     # shmem = cols * sizeof(Float64)
     # return @cuda blocks=1 threads=cols shmem=shmem reduce_kernel(input,rows,cols)
 
-    return @cuda blocks=1 threads=cols reduce_kernel(input,rows,cols)
+#     return @cuda blocks=1 threads=cols reduce_kernel(input,rows,cols)
      
-end
+# end
