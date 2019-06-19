@@ -35,12 +35,14 @@ function run_genome_scan()
         println("too big to process")
     else
 
-        # compare_cpu_gpu_result(Y,G,n,m,p);
-        cpu_timing = benchmark(10, cpurun, Y, G,n);
-        gpu_timing = benchmark(10, gpurun, Y, G,n,m,p);
-        speedup = cpu_timing[3]/gpu_timing[3];
+        # check_gpu_idx(Y,G,n,m,p)
+        # check_cpu_idx(Y,G,n)
+        compare_cpu_gpu_result(Y,G,n,m,p);
+        # cpu_timing = benchmark(10, cpurun, Y, G,n);
+        # gpu_timing = benchmark(10, gpurun, Y, G,n,m,p);
+        # speedup = cpu_timing[3]/gpu_timing[3];
 
-        println("$m, $n, $p, $(cpu_timing[3]),  $(gpu_timing[3]), $speedup\n");
+        # println("$m, $n, $p, $(cpu_timing[3]),  $(gpu_timing[3]), $speedup\n");
     end
 
 end
@@ -61,14 +63,21 @@ function compare_cpu_gpu_result(Y,G,n,m,p)
     # idx_match = cpu_max_idx ≈ gpu_result[:,1]
     # max_match = cpu_max ≈ gpu_result[:,2]
 
-    idx_match = check_correctness(cpu_max_idx[1:100], gpu_result[1:100,1])
-    max_match = check_correctness(cpu_max[35554:35556], gpu_result[35554, 35556,2])
-    
-    
-    # display(cpu_result[2][1:10])
-    # display(cpu_max_idx[1:10])
-    # display(gpu_result[1:10,1])
+    idx_match = check_correctness(cpu_max_idx[70:80], gpu_result[70:80,1])
+    max_match = check_correctness(cpu_max, gpu_result[:,2])
 
+    # println("GPU lod row 79:")
+    # display(gpu_result[1:7321, 3])
+    open("row79gpu.csv", "w") do io 
+        writedlm(io, gpu_result[1:7321, 3])
+    end
+    
+    # Printing idx matching result
+    # display(cpu_result[2][1:10])
+    # display(cpu_max_idx[70:80])
+    # display(gpu_result[70:80,1])
+
+    # Printing max of each column result
     # display(cpu_max[35550:35556])
     # display(gpu_result[35550:35556, 2])
 
@@ -77,6 +86,16 @@ function compare_cpu_gpu_result(Y,G,n,m,p)
 
     println("Correctness result: Index match? $idx_match, Max Match? $max_match.")
 
+end
+
+function check_gpu_idx(Y,G,n,m,p)
+    gpu_result = gpurun(Y,G,n,m,p)
+    display(gpu_result[1:90, 1])
+end
+
+function check_cpu_idx(Y,G,n)
+    cpu_result = cpurun(Y,G,n)
+    display(cpu_result[1][])
 end
 
 function run_simulation(n,m,p)

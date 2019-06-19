@@ -12,7 +12,7 @@ function gpurun(a::Array{Float64,2}, b::Array{Float64,2},n,m,p)
     d_r = calculate_r(d_a,d_b);
     gpu_square_lod(d_r,n,m,p)
     # gpu_reduce(d_r,m,p)
-    return collect(d_r[:, 1:2])
+    return collect(d_r[:, 1:3])
 end
 
 function gpu_square_lod(d_r::CuArray{Float64,2},n,m,p)
@@ -48,7 +48,7 @@ function reduce_kernel(input, rows, cols)
     # temp_max = shmem[1]
 
     # Trying for simplest kernel
-    if(tid < rows)
+    if(tid < rows+1)
         temp_max = input[tid, 1]
         max_idx = 1
         for i in 1:cols
@@ -60,6 +60,15 @@ function reduce_kernel(input, rows, cols)
         input[tid,1] = max_idx
         input[tid,2] = temp_max
     end
+    if(tid<cols)
+        input[tid,3] = input[79,tid]
+    end
+    # if(tid < rows+1)
+    #     for i in 1:cols
+    #         input[tid, 1] = i
+    #     end
+    # end
+
     return
 end
 

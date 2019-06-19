@@ -1,16 +1,31 @@
+using Test
 
+# function my_isapprox(x,y)
+#     return isapprox(x,y, atol=1e-3);
+# end
 
-function my_isapprox(x,y)
-    return isapprox(x,y, atol=1e-3);
-end
-
-function check_correctness(a, b, length)
-    for i in 1:length
-        if(!isapprox(a[i],b[i], atol=1e-3))
-            return false
-        end 
+function check_correctness(a, b)
+    if (length(a)!=length(b))
+        return println("Dimention mismatch when checking for correctness, abort checking.")
     end
-    return true
+
+    result = Array{Bool}(undef, length(a))
+    for i in 1:length(a)
+        if(!isapprox(a[i],b[i], atol=1e-3))
+            println("Mismatch at index: $i, comparing $(a[i]) and $(b[i]). ")
+            result[i] = false
+        else
+            result[i] = true
+        end 
+
+    end
+
+    if(all(result))
+        return true
+    else 
+        return false
+    end
+
 end
 
 function set_blas_threads()

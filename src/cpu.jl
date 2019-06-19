@@ -25,19 +25,19 @@ function lod_score(n, r::Array{Float64,2})
         return r
 end
 
-function cpurun_with_covar(Y::Array{Float64,2}, G::Array{Float64,2}, X::Array{Float64,2}, n)
-    px = calculate_px(X)
-    # display(px)
-    y_hat = LinearAlgebra.BLAS.gemm('N', 'N', px, Y)
-    g_hat = LinearAlgebra.BLAS.gemm('N', 'N', px, G)
-    y_tilda = Y .- y_hat
-    g_tilda = G .- g_hat
-    y_std = get_standardized_matrix(y_tilda)
-    g_std = get_standardized_matrix(g_tilda)
-    r = calculate_r(y_std, g_std)
-    lod = lod_score_multithread(n, r)
-    return lod
-end
+# function cpurun_with_covar(Y::Array{Float64,2}, G::Array{Float64,2}, X::Array{Float64,2}, n)
+#     px = calculate_px(X)
+#     # display(px)
+#     y_hat = LinearAlgebra.BLAS.gemm('N', 'N', px, Y)
+#     g_hat = LinearAlgebra.BLAS.gemm('N', 'N', px, G)
+#     y_tilda = Y .- y_hat
+#     g_tilda = G .- g_hat
+#     y_std = get_standardized_matrix(y_tilda)
+#     g_std = get_standardized_matrix(g_tilda)
+#     r = calculate_r(y_std, g_std)
+#     lod = lod_score_multithread(n, r)
+#     return lod
+# end
 
 
 ##################### Running CPU Function ###################
@@ -49,7 +49,9 @@ function cpurun(a::Array, b::Array, n)
     #step 3: calculate r square and lod score
     # lod = lod_score(n, r);
     lod = lod_score_multithread(n,r)
-    # println("Size of CPU lod: $(size(lod))")
+    open("row79cpu.csv", "w") do io 
+        writedlm(io, lod[79,:])
+    end
     return findmax(lod, dims=2)
 end
 
