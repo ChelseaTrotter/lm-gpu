@@ -47,6 +47,6 @@ function print_cpu_timing(a, b, n)
     r = time_me_with_return(calculate_r,a_std,b_std);
     #step 3: calculate r square and lod score
     lod = time_me_with_return(lod_score_multithread,n, r);
-    return lodvim 
+    return lod
 
 end
