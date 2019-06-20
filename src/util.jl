@@ -4,15 +4,17 @@ using Test
 #     return isapprox(x,y, atol=1e-3);
 # end
 
-function check_correctness(a, b)
-    if (length(a)!=length(b))
+function check_correctness(idx_a, idx_b, v_a, v_b)
+    if (length(idx_a)!=length(idx_b))
         return println("Dimention mismatch when checking for correctness, abort checking.")
     end
 
-    result = Array{Bool}(undef, length(a))
-    for i in 1:length(a)
-        if(!isapprox(a[i],b[i], atol=1e-3))
-            println("Mismatch at index: $i, comparing $(a[i]) and $(b[i]). ")
+    result = Array{Bool}(undef, length(idx_a))
+    for i in 1:length(idx_a)
+        b = convert(Int, idx_b[i])
+        if(!isapprox(idx_a[i],b, atol=1e-3))
+            # println("Mismatch at index: $i, comparing $(idx_a[i]) and $(b), 
+            #         value is $(v_a[i]) and $(v_b[i]).")
             result[i] = false
         else
             result[i] = true
@@ -25,7 +27,27 @@ function check_correctness(a, b)
     else 
         return false
     end
+end
 
+function check_correctness(v_a, v_b)
+    if (length(v_a)!=length(v_b))
+        return println("Dimention mismatch when checking for correctness, abort checking.")
+    end
+
+    result = Array{Bool}(undef, length(v_a))
+    for i in 1:length(v_a)
+        if(!isapprox(v_a[i],v_b[i], atol=1e-3))
+            result[i] = false
+        else
+            result[i] = true
+        end 
+    end
+
+    if(all(result))
+        return true
+    else 
+        return false
+    end
 end
 
 function set_blas_threads()
