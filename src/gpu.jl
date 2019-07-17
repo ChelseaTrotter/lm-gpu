@@ -10,6 +10,7 @@ function gpurun(Y::Array{Float64,2}, G::Array{Float64,2},n,m,p)
 
     g_std = get_standardized_matrix(G);
     lod = zeros(0,2)
+    d_g = CuArray(g_std);
     for i = 1:num_block
         # i = 1
         begining = block_size * (i-1) +1
@@ -23,7 +24,6 @@ function gpurun(Y::Array{Float64,2}, G::Array{Float64,2},n,m,p)
         y_std = get_standardized_matrix(y_block);
         
         d_y = CuArray(y_std);
-        d_g = CuArray(g_std);
         d_r = calculate_r(d_y,d_g);
         actual_block_size = ending - begining + 1 #it is only different from block size at the last loop since we are calculating the left over block not a whole block. 
         gpu_square_lod(d_r,n,actual_block_size,p)
