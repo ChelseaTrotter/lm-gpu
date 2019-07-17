@@ -9,7 +9,7 @@ function reduce_kernel(input, output, ndrange, rows)
     end
 end
 
-function gpu_reduce(input::CuArray{Float64,2},output::CuArray{Float64,2}, rows, cols)
+function gpu_reduce(input::CuArray{Float32,2},output::CuArray{Float32,2}, rows, cols)
     #Get total number of threads 
     ndrange = cols
     #Get maximum number of threads per block

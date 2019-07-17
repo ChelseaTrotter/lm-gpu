@@ -1,17 +1,38 @@
 import CuArrays.CuArray
 
 function calculate_r(a::CuArray,b::CuArray)
-    return CuArrays.BLAS.gemm('T', 'N', a,b);
+    return CuArrays.CUBLAS.gemm('T', 'N', a,b);
 end   
 
-function gpurun(a::Array{Float64,2}, b::Array{Float64,2},n,m,p)
-    a_std = get_standardized_matrix(a);
-    b_std = get_standardized_matrix(b);
-    d_a = CuArray(a_std);
-    d_b = CuArray(b_std);
-    d_r = calculate_r(d_a,d_b);
-    gpu_square_lod(d_r,n,m,p)
-    return collect(d_r[:, 1:2])
+function gpurun(Y::Array{Float64,2}, G::Array{Float64,2},n,m,p)
+    (num_block, block_size) = get_pheno_block_size(n,m,p)
+    # println("seperated into $num_block blocks, containing $block_size individual per block. ")
+
+    g_std = get_standardized_matrix(G);
+    lod = zeros(0,2)
+    for i = 1:num_block
+        # i = 1
+        begining = block_size * (i-1) +1
+        ending = i * block_size
+        if (i == num_block)
+            ending = size(Y)[2]
+        end
+        # println("processing $begining to $ending...")
+        
+        y_block = Y[:, begining : ending]
+        y_std = get_standardized_matrix(y_block);
+        
+        d_y = CuArray(y_std);
+        d_g = CuArray(g_std);
+        d_r = calculate_r(d_y,d_g);
+        actual_block_size = ending - begining + 1 #it is only different from block size at the last loop since we are calculating the left over block not a whole block. 
+        gpu_square_lod(d_r,n,actual_block_size,p)
+
+        lod = vcat(lod, collect(d_r[:, 1:2]))
+        # println("finished $i")
+    end
+    # println("GPU result size: $(size(lod))")
+    return lod
 end
 
 function gpu_square_lod(d_r::CuArray{Float64,2},n,m,p)

@@ -4,17 +4,16 @@ using Test
 #     return isapprox(x,y, atol=1e-3);
 # end
 
-function check_correctness(idx_a, idx_b, v_a, v_b)
+function check_correctness_idx(idx_a, idx_b)
     if (length(idx_a)!=length(idx_b))
         return println("Dimention mismatch when checking for correctness, abort checking.")
     end
 
     result = Array{Bool}(undef, length(idx_a))
     for i in 1:length(idx_a)
+        a = convert(Int, idx_a[i])
         b = convert(Int, idx_b[i])
-        if(!isapprox(idx_a[i],b, atol=1e-3))
-            # println("Mismatch at index: $i, comparing $(idx_a[i]) and $(b), 
-            #         value is $(v_a[i]) and $(v_b[i]).")
+        if(!isapprox(a,b))
             result[i] = false
         else
             result[i] = true
@@ -86,7 +85,17 @@ function get_gpu_mem_size()
     mem = Mem.total()
     destroy!(ctx)
     return mem
+end
 
+
+function get_pheno_block_size(n::Int, m::Int, p::Int)
+    total_data_size = (n*m + n*p + m*p) * sizeof(Float64) # get the number of bytes in total 
+    # gpu_mem = get_gpu_mem_size()*0.9 # can not use all of gpu memory, need to leave some for intermediate result. 
+    gpu_mem = 16914055168 * 0.9 # can not use all of gpu memory, need to leave some for intermediate result.
+    #if m is too big for gpu memory, I need to seperate m into several blocks to process 
+    block_size = Int(ceil((gpu_mem - (n*p))/((n+p) * sizeof(Float64))))
+    num_block = Int(ceil(m/block_size))
+    return (num_block, block_size)
 end
 
 function time_me_with_return(f::Function,x...)
