@@ -23,8 +23,8 @@ include("../src/common.jl")
 
 function run_genome_scan()
     pheno = readdlm("../data/hippocampus-pheno-nomissing.csv", ','; skipstart=1)[:,2:end-1]
-    G_prob = convert(Array{Float64,2},readdlm("../data/hippocampus-genopr-AA-BB.csv", ','; skipstart=1)[:,2:end])
-    Y = convert(Array{Float64,2}, pheno[:, 1:end])
+    G_prob = convert(Array{Float32,2},readdlm("../data/hippocampus-genopr-AA-BB.csv", ','; skipstart=1)[:,2:end])
+    Y = convert(Array{Float32,2}, pheno[:, 1:end])
     G = G_prob[:, 1:2:end]
     # X_temp = readdlm("../data/hippocampus-pheno-nomissing.csv", ','; skipstart=1)[:,half_pheno_size]
     # X = hcat(ones(size(X_temp)[1]),process_x(X_temp))
@@ -40,11 +40,11 @@ function run_genome_scan()
     # gpurun(Y,G,n,m,p)
 
     # compare_cpu_gpu_result(Y,G,n,m,p);
-    # cpu_timing = benchmark(5, cpurun, Y, G,n);
+    cpu_timing = benchmark(5, cpurun, Y, G,n);
     gpu_timing = benchmark(5, gpurun, Y, G,n,m,p);
-    # speedup = cpu_timing[3]/gpu_timing[3];
+    speedup = cpu_timing[3]/gpu_timing[3];
 
-    # println("$m, $n, $p, $(cpu_timing[3]),  $(gpu_timing[3]), $speedup\n");
+    println("$m, $n, $p, $(cpu_timing[3]),  $(gpu_timing[3]), $speedup\n");
 
 end
 

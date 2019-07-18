@@ -3,29 +3,29 @@ function calculate_r(a::Array,b::Array)
     return LinearAlgebra.BLAS.gemm('T', 'N', a,b);
 end
 
-function lod_score_multithread(m,r::Array{Float64,2})
-    n = convert(Float64,m)
+function lod_score_multithread(m,r::Array{Float32,2})
+    n = convert(Float32,m)
     Threads.@threads for j in 1:size(r)[2]
         for i in 1:size(r)[1]
-            r_square::Float64 = (r[i,j]/n)^2
-            r[i,j]= -n/Float64(2.0) * log(Float64(1.0)-r_square)
+            r_square::Float32 = (r[i,j]/n)^2
+            r[i,j]= -n/Float32(2.0) * log(Float32(1.0)-r_square)
         end
     end
     return r
 end
 
-function lod_score(n, r::Array{Float64,2})
+function lod_score(n, r::Array{Float32,2})
     for j in 1:size(r)[2]
         for i in 1:size(r)[1]
-            r_square::Float64 = (r[i,j]/n)^2
-            r[i,j] = -n/Float64(2.0) * log(Float64(1.0)-r_square)
+            r_square::Float32 = (r[i,j]/n)^2
+            r[i,j] = -n/Float32(2.0) * log(Float32(1.0)-r_square)
         end
     end
     return r
 end
 
-function find_max_idx_value(lod::Array{Float64,2})
-    max_array = Array{Float64,2}(undef, size(lod)[1], 2)
+function find_max_idx_value(lod::Array{Float32,2})
+    max_array = Array{Float32,2}(undef, size(lod)[1], 2)
     Threads.@threads for i in 1:size(lod)[1]
         temp = lod[i,1]
         idx = 1
