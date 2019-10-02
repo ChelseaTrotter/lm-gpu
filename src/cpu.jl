@@ -1,3 +1,10 @@
+function calculate_px(x::Array{Float64,2})
+    XtX = transpose(x)*x
+    result = X*inv(XtX)*transpose(x)
+    # display(result)
+    return result
+end
+
 
 function calculate_r(a::Array,b::Array)
     return LinearAlgebra.BLAS.gemm('T', 'N', a,b);
@@ -24,6 +31,22 @@ function lod_score(n, r::Array{Float32,2})
     return r
 end
 
+
+function cpurun_with_covar(Y::Array{Float64,2}, G::Array{Float64,2}, X::Array{Float64,2}, n)
+    px = calculate_px(X)
+    # display(px)
+    y_hat = LinearAlgebra.BLAS.gemm('N', 'N', px, Y)
+    g_hat = LinearAlgebra.BLAS.gemm('N', 'N', px, G)
+    y_tilda = Y .- y_hat
+    g_tilda = G .- g_hat
+    y_std = get_standardized_matrix(y_tilda)
+    g_std = get_standardized_matrix(g_tilda)
+    r = calculate_r(y_std, g_std)
+    lod = lod_score_multithread(n, r)
+    return lod
+end
+
+
 function find_max_idx_value(lod::Array{Float32,2})
     max_array = Array{Float32,2}(undef, size(lod)[1], 2)
     Threads.@threads for i in 1:size(lod)[1]
@@ -42,6 +65,7 @@ function find_max_idx_value(lod::Array{Float32,2})
     # display(max_array[1:10, 1:2])
     return max_array
 end
+
 
 ##################### Running CPU Function ###################
 function cpurun(a::Array, b::Array, n)
