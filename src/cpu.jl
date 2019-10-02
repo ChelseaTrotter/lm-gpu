@@ -1,3 +1,10 @@
+function calculate_px(x::Array{Float64,2})
+    XtX = transpose(x)*x
+    result = X*inv(XtX)*transpose(x)
+    # display(result)
+    return result
+end
+
 
 function calculate_r(a::Array,b::Array)
     return LinearAlgebra.BLAS.gemm('T', 'N', a,b);
@@ -22,6 +29,20 @@ function lod_score(n, r::Array{Float64,2})
         end
     end
         return r
+end
+
+function cpurun_with_covar(Y::Array{Float64,2}, G::Array{Float64,2}, X::Array{Float64,2}, n)
+    px = calculate_px(X)
+    # display(px)
+    y_hat = LinearAlgebra.BLAS.gemm('N', 'N', px, Y)
+    g_hat = LinearAlgebra.BLAS.gemm('N', 'N', px, G)
+    y_tilda = Y .- y_hat
+    g_tilda = G .- g_hat
+    y_std = get_standardized_matrix(y_tilda)
+    g_std = get_standardized_matrix(g_tilda)
+    r = calculate_r(y_std, g_std)
+    lod = lod_score_multithread(n, r)
+    return lod
 end
 
 
