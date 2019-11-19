@@ -17,9 +17,7 @@ include("../src/util.jl")
 include("../src/cpu.jl")
 include("../src/gpu.jl")
 include("../src/common.jl")
-
-
-
+include("../src/cli.jl")
 
 function run_genome_scan()
     pheno = readdlm("../data/hippocampus-pheno-nomissing.csv", ','; skipstart=1)[:,2:end-1]
@@ -88,8 +86,18 @@ function run_simulation(n,m,p)
 end
 
 
+function main()
+    cli_args = parse_commandline()
+    # picking threashold of rowsum of NA
+    th = cli_args["threashold"]
+    # use pseudomarker to impute genotype
+    use_pseudomarker = cli_args["use_pseudomarker"]
+    # seed for random number generator to impute phenotype
+    seed = cli_args["rseed"]
+    
+end
 
-
+main() 
 
 set_blas_threads();
 # run_simulation(n,m,p);
