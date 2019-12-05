@@ -17,21 +17,16 @@ using RCall
 url = ARGS
 
 R"""
-library(qtl2); get_data <- function(){
-data <- read_cross2($url)
+library(qtl2); get_data <- function(url){
+data <- read_cross2(url)
 return(data)
 }
 """
-data = R"get_data"()
-
-
-# read in data with zip file by url
-# library(qtl2)
-# grav2 <- read_cross2("https://kbroman.org/qtl2/assets/sampledata/grav2/grav2.zip")
-# zip the data
+data = R"get_data"(url)
 
 display(data)
 names(data)
 geno = data[:geno];
 pheno = data[:pheno];
+
 
