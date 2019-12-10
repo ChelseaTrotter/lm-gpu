@@ -67,16 +67,21 @@ function find_max_idx_value(lod::Array{Float32,2})
 end
 
 
+
 ##################### Running CPU Function ###################
-function cpurun(a::Array, b::Array, n)
+function cpurun(a::Array, b::Array, n, export_max_lod)
     a_std = get_standardized_matrix(a);
     b_std = get_standardized_matrix(b);
     #step 2: calculate R, matrix of corelation coefficients
     r = calculate_r(a_std,b_std);
     #step 3: calculate r square and lod score
     # lod = lod_score(n, r);
-    lod = lod_score_multithread(n,r)
+    if !export_max_lod
+        lod = lod_score_multithread(n,r)
+        return lod
+    end
     return find_max_idx_value(lod)
+
 end
 
 ##############################################################

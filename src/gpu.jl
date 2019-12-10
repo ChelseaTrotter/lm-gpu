@@ -1,4 +1,8 @@
+using CuArrays
+using CUDAnative
+using CUDAdrv
 import CuArrays.CuArray
+
 
 function calculate_r(a::CuArray,b::CuArray)
     return CuArrays.CUBLAS.gemm('T', 'N', a,b);

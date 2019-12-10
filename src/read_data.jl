@@ -1,32 +1,41 @@
-using RCall 
+using RCall
+using DelimitedFiles
 
-# RIL by selfing 
+include("cli.jl")
 
-# read yaml file
-# library(qtl2)
-# grav2 <- read_cross2("https://kbroman.org/qtl2/assets/sampledata/grav2/grav2.yaml")
-# R"""
-# library(vioplot); agrenViolinPlot <- function(){
-# agrenURL <- "https://bitbucket.org/linen/smalldata/raw/3c9bcd603b67a16d02c5dc23e7e3e637758d4d5f/arabidopsis/agren2013.csv"
-# agren <- read.csv(agrenURL); agrenFit <- agren[,c(1,2,3,4,5,6)]
-# vioplot(agrenFit, names=names(agrenFit), main = "ViolinPlot of Fitness Values per site and year", xlab ="Site", ylab =  "Fitness Values",col = rainbow(6))}
-# """
-# R"agrenViolinPlot"();
 
-# ARGS is the Julia Macro for commandline arguments.
-url = ARGS
+function rcall_read_cross2()
+    # url = ARGS
+    url = "/Users/xiaoqihu/Documents/hg/lm-gpu/data/spleen/bxd-spleen.yaml"
+    # url = "http://gn2-zach.genenetwork.org/api/v_pre1/genotypes/rqtl2/BXD.zip"
 
-R"""
-library(qtl2); get_data <- function(url){
-data <- read_cross2(url)
-return(data)
-}
-"""
-data = R"get_data"(url)
+    R"""
+    library(qtl2); 
+    get_data <- function(url){
+    data <- read_cross2(url)
+    return(data)
+    }
+    """
+    data = R"get_data"(url)
+end
 
-display(data)
-names(data)
-geno = data[:geno];
-pheno = data[:pheno];
+function get_geno_data(file)
+    # The following two commnet lines shows how genotype file is processed originally in test.jl. 
+    # G_prob = convert(Array{Float32,2},readdlm("../data/hippocampus-genopr-AA-BB.csv", ','; skipstart=1)[:,2:end])
+    # G = G_prob[:, 1:2:end]
+
+    geno_prob = convert(Array{Float32,2},readdlm(file, ','; skipstart=1)[:,2:end])
+    return geno_prob[:,1:2:end]
+end
+
+function get_pheno_data(file)
+    # The following two commnet lines shows how phenotype file is processed originally in test.jl. 
+    # pheno = readdlm("../data/hippocampus-pheno-nomissing.csv", ','; skipstart=1)[:,2:end-1]
+    # Y = convert(Array{Float32,2}, pheno[:, 1:end])
+
+    pheno = readdlm(file, ','; skipstart=1)[:,2:end-1]
+    return convert(Array{Float32,2}, pheno[:, 1:end])
+
+end
 
 

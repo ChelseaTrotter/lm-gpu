@@ -6,27 +6,23 @@ using Dates
 using Random
 using Statistics
 using LinearAlgebra
-using CuArrays
-using CUDAnative
-using CUDAdrv
+# 
 
 import Base.@elapsed 
 
 
 include("../src/util.jl")
 include("../src/cpu.jl")
-include("../src/gpu.jl")
+# include("../src/gpu.jl")
 include("../src/common.jl")
 include("../src/cli.jl")
 
-function run_genome_scan()
-    pheno = readdlm("../data/hippocampus-pheno-nomissing.csv", ','; skipstart=1)[:,2:end-1]
-    G_prob = convert(Array{Float32,2},readdlm("../data/hippocampus-genopr-AA-BB.csv", ','; skipstart=1)[:,2:end])
-    Y = convert(Array{Float32,2}, pheno[:, 1:end])
-    G = G_prob[:, 1:2:end]
+function run_genome_scan(geno_file, pheno_file, export_max_lod)
+
+    G = get_geno_data(geno_file)
+    Y = get_pheno_data(pheno_file)
     # X_temp = readdlm("../data/hippocampus-pheno-nomissing.csv", ','; skipstart=1)[:,half_pheno_size]
     # X = hcat(ones(size(X_temp)[1]),process_x(X_temp))
-    
     
     n = size(Y,1)
     m = size(Y,2)
@@ -34,16 +30,18 @@ function run_genome_scan()
 
     println("*************************** n: $n,m: $m, p: $p******************************");
 
-    # cpurun(Y, G,n)
-    # gpurun(Y,G,n,m,p)
+    # cpu = cpurun(Y, G,n)
+    # gpu = gpurun(Y,G,n,m,p)
 
     # compare_cpu_gpu_result(Y,G,n,m,p);
-    cpu_timing = benchmark(5, cpurun, Y, G,n);
-    gpu_timing = benchmark(5, gpurun, Y, G,n,m,p);
-    speedup = cpu_timing[3]/gpu_timing[3];
+    # cpu_timing = benchmark(5, cpurun, Y, G,n);
+    # gpu_timing = benchmark(5, gpurun, Y, G,n,m,p);
+    # speedup = cpu_timing[3]/gpu_timing[3];
 
-    println("$m, $n, $p, $(cpu_timing[3]),  $(gpu_timing[3]), $speedup\n");
+    # println("$m, $n, $p, $(cpu_timing[3]),  $(gpu_timing[3]), $speedup\n");
 
+    cpurun(Y, G,n,export_max_lod)
+    
 end
 
 function compare_cpu_gpu_result(Y,G,n,m,p)
@@ -88,20 +86,26 @@ end
 
 function main()
     cli_args = parse_commandline()
-    # picking threashold of rowsum of NA
-    th = cli_args["threashold"]
-    # use pseudomarker to impute genotype
-    use_pseudomarker = cli_args["use_pseudomarker"]
-    # seed for random number generator to impute phenotype
-    seed = cli_args["rseed"]
+    geno_file = cli_args["geno_file"]
+    pheno_file = cli_args["pheno_file"]
+    export_max_lod = cli_args["export_max_lod"]
+    set_blas_threads();
+    run_genome_scan(geno_file, pheno_file, export_max_lod);
+
+    # # picking threashold of rowsum of NA
+    # th = cli_args["threashold"]
+    # # use pseudomarker to impute genotype
+    # use_pseudomarker = cli_args["use_pseudomarker"]
+    # # seed for random number generator to impute phenotype
+    # seed = cli_args["rseed"]
     
 end
 
 main() 
 
-set_blas_threads();
+
 # run_simulation(n,m,p);
-run_genome_scan();
+
 
 
 
