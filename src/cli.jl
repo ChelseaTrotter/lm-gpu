@@ -4,17 +4,17 @@ function parse_commandline()
     s = ArgParseSettings()
 
     @add_arg_table s begin
-        "url"
-            help = "A url that points to the data location"
-            required = true
+        # "url"
+        #     help = "A url that points to the data location"
+        #     required = true
         "--geno_file"
             help = "input geno type file"
             required = true
         "--pheno_file"
             help = "clean pheno type file"
             required = true
-        "--export_max_lod"
-            help = "if flaged, maximum lod score will be exported, it will be one column instead of a matrix"
+        "--export_matrix"
+            help = "if flaged, lod matrix will be exported. If not flagged, a vector of max lod will be exported."
             action = :store_true
         "--output_file"
             help = "name of the file you want to output"
@@ -35,14 +35,3 @@ function parse_commandline()
 
     return parse_args(s)
 end
-
-function main()
-    parsed_args = parse_commandline()
-    println("Parsed args:")
-    for pa in parsed_args
-        println("  $(pa[1])  =>  $(pa[2])")
-    end
-    display(parsed_args)
-end
-
-main() 

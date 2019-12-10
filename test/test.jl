@@ -16,8 +16,9 @@ include("../src/cpu.jl")
 # include("../src/gpu.jl")
 include("../src/common.jl")
 include("../src/cli.jl")
+include("../src/read_data.jl")
 
-function run_genome_scan(geno_file, pheno_file, export_max_lod)
+function run_genome_scan(geno_file, pheno_file, export_matrix)
 
     G = get_geno_data(geno_file)
     Y = get_pheno_data(pheno_file)
@@ -40,8 +41,8 @@ function run_genome_scan(geno_file, pheno_file, export_max_lod)
 
     # println("$m, $n, $p, $(cpu_timing[3]),  $(gpu_timing[3]), $speedup\n");
 
-    cpurun(Y, G,n,export_max_lod)
-    
+    cpurun(Y, G,n,export_matrix)
+
 end
 
 function compare_cpu_gpu_result(Y,G,n,m,p)
@@ -88,9 +89,9 @@ function main()
     cli_args = parse_commandline()
     geno_file = cli_args["geno_file"]
     pheno_file = cli_args["pheno_file"]
-    export_max_lod = cli_args["export_max_lod"]
+    export_matrix = cli_args["export_matrix"]
     set_blas_threads();
-    run_genome_scan(geno_file, pheno_file, export_max_lod);
+    run_genome_scan(geno_file, pheno_file, export_matrix);
 
     # # picking threashold of rowsum of NA
     # th = cli_args["threashold"]
