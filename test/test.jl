@@ -6,7 +6,6 @@ using Dates
 using Random
 using Statistics
 using LinearAlgebra
-# 
 
 import Base.@elapsed 
 
@@ -18,7 +17,7 @@ include("../src/common.jl")
 include("../src/cli.jl")
 include("../src/read_data.jl")
 
-function run_genome_scan(geno_file, pheno_file, export_matrix)
+function run_genome_scan(geno_file, pheno_file, export_matrix, output_file)
 
     G = get_geno_data(geno_file)
     Y = get_pheno_data(pheno_file)
@@ -29,7 +28,7 @@ function run_genome_scan(geno_file, pheno_file, export_matrix)
     m = size(Y,2)
     p = size(G,2)
 
-    println("*************************** n: $n,m: $m, p: $p******************************");
+    # println("*************************** n: $n,m: $m, p: $p******************************");
 
     # cpu = cpurun(Y, G,n)
     # gpu = gpurun(Y,G,n,m,p)
@@ -41,7 +40,8 @@ function run_genome_scan(geno_file, pheno_file, export_matrix)
 
     # println("$m, $n, $p, $(cpu_timing[3]),  $(gpu_timing[3]), $speedup\n");
 
-    cpurun(Y, G,n,export_matrix)
+    # Depending on $export_matrix, lod will be a vector of max lod, or lod matrix.
+    return lod = cpurun(Y, G,n,export_matrix)
 
 end
 
@@ -86,13 +86,18 @@ end
 
 
 function main()
-    cli_args = parse_commandline()
-    geno_file = cli_args["geno_file"]
-    pheno_file = cli_args["pheno_file"]
-    export_matrix = cli_args["export_matrix"]
+    geno_file = "/Users/xiaoqihu/Documents/hg/genome-scan-data-cleaning/data/geno_prob.csv"
+    pheno_file = "/Users/xiaoqihu/Documents/hg/genome-scan-data-cleaning/data/imputed_pheno.csv"
+    export_matrix = false
+    output_file = "lod.csv"
+    # cli_args = parse_commandline()
+    # geno_file = cli_args["geno_file"]
+    # pheno_file = cli_args["pheno_file"]
+    # export_matrix = cli_args["export_matrix"]
+    # output_file = cli_args["output_file"]
     set_blas_threads();
-    run_genome_scan(geno_file, pheno_file, export_matrix);
-
+    lod = run_genome_scan(geno_file, pheno_file, export_matrix, output_file);
+    return 
     # # picking threashold of rowsum of NA
     # th = cli_args["threashold"]
     # # use pseudomarker to impute genotype
@@ -102,7 +107,7 @@ function main()
     
 end
 
-main() 
+main();
 
 
 # run_simulation(n,m,p);
