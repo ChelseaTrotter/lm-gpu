@@ -6,6 +6,7 @@ using Dates
 using Random
 using Statistics
 using LinearAlgebra
+using Plots
 
 import Base.@elapsed 
 
@@ -86,18 +87,25 @@ end
 
 
 function main()
-    geno_file = "/Users/xiaoqihu/Documents/hg/genome-scan-data-cleaning/data/geno_prob.csv"
-    pheno_file = "/Users/xiaoqihu/Documents/hg/genome-scan-data-cleaning/data/imputed_pheno.csv"
-    export_matrix = false
-    output_file = "lod.csv"
-    # cli_args = parse_commandline()
-    # geno_file = cli_args["geno_file"]
-    # pheno_file = cli_args["pheno_file"]
-    # export_matrix = cli_args["export_matrix"]
-    # output_file = cli_args["output_file"]
+#    geno_file = "/Users/xiaoqihu/Documents/hg/genome-scan-data-cleaning/test/geno_prob.csv"
+#    pheno_file = "/Users/xiaoqihu/Documents/hg/genome-scan-data-cleaning/test/imputed_pheno.csv"
+#    export_matrix = false
+#    output_file = "lod.csv"
+    cli_args = parse_commandline()
+    geno_file = cli_args["geno_file"]
+    pheno_file = cli_args["pheno_file"]
+    export_matrix = cli_args["export_matrix"]
+    output_file = cli_args["output_file"]
     set_blas_threads();
     lod = run_genome_scan(geno_file, pheno_file, export_matrix, output_file);
-    return 
+    # Drawing plot
+#    plotlyjs()
+#    unicodeplots()
+#    histo = histogram(lod[:,2])
+#    print(histo)
+#    png(histo, "lod") 
+
+#    return 
     # # picking threashold of rowsum of NA
     # th = cli_args["threashold"]
     # # use pseudomarker to impute genotype
@@ -107,7 +115,7 @@ function main()
     
 end
 
-main();
+lod=main();
 
 
 # run_simulation(n,m,p);
