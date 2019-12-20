@@ -115,7 +115,7 @@ function main()
     
 end
 
-lod=main();
+ lod=main();
 
 
 # run_simulation(n,m,p);
